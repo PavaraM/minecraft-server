@@ -3,45 +3,16 @@ variable "project" {
   default = "minecraft-server-ism"
 }
 
-variable "region" {
-  description = "OCI region"
-  type        = string
-  default     = "ap-mumbai-1"
-}
-
 variable "compartment_id" {
   description = "OCI compartment used by the Minecraft project"
   type        = string
-}
-
-variable "tenancy_ocid" {
-  description = "OCI tenancy OCID"
-  type        = string
-  sensitive   = true
-}
-
-variable "user_ocid" {
-  description = "OCI user OCID"
-  type        = string
-  sensitive   = true
-}
-
-variable "fingerprint" {
-  description = "OCI API key fingerprint"
-  type        = string
-  sensitive   = true
-}
-
-variable "private_key_path" {
-  description = "Path to Terraform OCI API private key"
-  type        = string
-  sensitive   = true
 }
 
 variable "availability_domain" {
   description = "OCI availability domain"
   type        = string
 }
+
 
 variable "instance_shape" {
   description = "OCI compute shape"
@@ -52,13 +23,13 @@ variable "instance_shape" {
 variable "ocpus" {
   description = "Number of OCPUs"
   type        = number
-  default     = 4
+  default     = 2
 }
 
 variable "memory_in_gbs" {
   description = "Amount of memory in GB"
   type        = number
-  default     = 24
+  default     = 12
 }
 
 variable "ssh_public_key" {
