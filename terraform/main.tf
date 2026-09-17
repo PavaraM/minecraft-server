@@ -1,72 +1,97 @@
-# Network
-resource "oci_core_vcn" "vcn" {
+resource "oci_core_vcn" "minecraft" {
   compartment_id = var.compartment_id
-  display_name   = "${var.project}-vcn"
-  cidr_block    = "10.0.0.0/16"
+
+  display_name = "minecraft-vcn"
+  cidr_blocks  = ["10.0.0.0/16"]
+
+  dns_label = "minecraft"
 }
 
-resource "oci_core_subnet" "public-subnet" {
+resource "oci_core_internet_gateway" "minecraft" {
   compartment_id = var.compartment_id
-  vcn_id         = oci_core_vcn.vcn.id
-  display_name   = "${var.project}-public-subnet"
-  cidr_block    = "10.0.0.0/24"
-  internet_gateway_id = oci_core_internet_gateway.internet-gateway.id
+  vcn_id         = oci_core_vcn.minecraft.id
+
+  display_name = "minecraft-internet-gateway"
+  enabled      = true
 }
 
-resource "oci_core_internet_gateway" "internet-gateway" {
+resource "oci_core_route_table" "minecraft" {
   compartment_id = var.compartment_id
-  vcn_id         = oci_core_vcn.vcn.id
-  display_name   = "${var.project}-internet-gateway"
-}
+  vcn_id         = oci_core_vcn.minecraft.id
 
-resource "oci_core_route_table" "route-table" {
-  compartment_id = var.compartment_id
-  vcn_id         = oci_core_vcn.vcn.id
-  display_name   = "${var.project}-route-table"
+  display_name = "minecraft-route-table"
+
   route_rules {
-    destination_type = "CIDR_BLOCK"
-    destination      = "0.0.0.0/0"
-    network_entity_id = oci_core_internet_gateway.internet-gateway.id
+    destination       = "0.0.0.0/0"
+    destination_type  = "CIDR_BLOCK"
+    network_entity_id = oci_core_internet_gateway.minecraft.id
   }
 }
 
-resource "oci_core_subnet" "private-subnet" {
+resource "oci_core_security_list" "minecraft" {
   compartment_id = var.compartment_id
-  vcn_id         = oci_core_vcn.vcn.id
-  display_name   = "${var.project}-private-subnet"
-  cidr_block    = "10.0.1.0/24"
-  route_table_id = oci_core_route_table.route-table.id
+  vcn_id         = oci_core_vcn.minecraft.id
+
+  display_name = "minecraft-security-list"
+
+  ingress_security_rules {
+    protocol = "6"
+    source   = "0.0.0.0/0"
+
+    tcp_options {
+      min = 25565
+      max = 25565
+    }
+
+    description = "Minecraft Java Edition"
+  }
+
+  ingress_security_rules {
+    protocol = "6"
+    source   = "0.0.0.0/0"
+
+    tcp_options {
+      min = 22
+      max = 22
+    }
+
+    description = "SSH"
+  }
+
+  egress_security_rules {
+    protocol    = "all"
+    destination = "0.0.0.0/0"
+  }
+
+  ingress_security_rules {
+    protocol = "17"
+
+    source = "0.0.0.0/0"
+
+    udp_options {
+      min = 24454
+      max = 24454
+    }
+
+    description = "Simple Voice Chat"
+  }
 }
 
-resource "oci_core_security_list" "security-list" {
+resource "oci_core_subnet" "minecraft" {
   compartment_id = var.compartment_id
-  vcn_id         = oci_core_vcn.vcn.id
-  display_name   = "${var.project}-security-list"
-  ingress_security_rules {
-    protocol        = "tcp"
-    port            = 22
-    source_type     = "CIDR_BLOCK"
-    source          = "0.0.0.0/0"
-  }
+  vcn_id         = oci_core_vcn.minecraft.id
 
-  ingress_security_rules {
-    protocol        = "tcp"
-    port            = 25565
-    source_type     = "CIDR_BLOCK"
-    source          = "0.0.0.0/0"
-  }
-  
-  egress_security_rules {
-    protocol        = "tcp"
-    port            = 22
-    source_type     = "CIDR_BLOCK"
-    source          = "0.0.0.0/0"
-  }
+  display_name = "minecraft-public-subnet"
 
-  egress_security_rules {
-    protocol        = "tcp"
-    port            = 25565
-    source_type     = "CIDR_BLOCK"
-    source          = "0.0.0.0/0"
-  }
+  cidr_block = "10.0.1.0/24"
+
+  route_table_id = oci_core_route_table.minecraft.id
+
+  security_list_ids = [
+    oci_core_security_list.minecraft.id
+  ]
+
+  prohibit_public_ip_on_vnic = false
+
+  dns_label = "public"
 }
