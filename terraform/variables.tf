@@ -3,3 +3,6 @@ variable "project" {
   default = "ism-server"
 }
 
+variable "compartment_id" {
+  type = string
+}
