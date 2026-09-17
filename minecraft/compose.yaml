@@ -15,6 +15,7 @@ services:
       ONLINE_MODE: "FALSE"
       WHITELIST: "FALSE"
       MODS: "/mods"
+      WORLD: "/world"
 
     volumes:
       - minecraft-data:/data

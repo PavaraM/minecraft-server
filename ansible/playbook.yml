@@ -15,6 +15,7 @@
           - ca-certificates
           - curl
           - git
+          - rsync
         state: present
 
     - name: Create Docker keyring directory
@@ -107,6 +108,11 @@
         group: ubuntu
         mode: "0644"
 
+    - name: Check if world already exists on the server
+      ansible.builtin.stat:
+        path: /opt/minecraft/world/level.dat
+      register: world_seeded
+
     - name: Create Minecraft world directory
       ansible.builtin.file:
         path: /opt/minecraft/world
@@ -114,14 +120,23 @@
         owner: ubuntu
         group: ubuntu
         mode: "0755"
+      when: not world_seeded.stat.exists
 
-    - name: Copy Minecraft world
-      ansible.builtin.copy:
+    - name: Seed Minecraft world via rsync (first run only)
+      ansible.posix.synchronize:
         src: "{{ playbook_dir }}/../minecraft/world/"
         dest: /opt/minecraft/world/
+      become: false
+      when: not world_seeded.stat.exists
+
+    - name: Fix world ownership after rsync seed
+      ansible.builtin.file:
+        path: /opt/minecraft/world
+        state: directory
         owner: ubuntu
         group: ubuntu
-        mode: "0644"
+        recurse: true
+      when: not world_seeded.stat.exists
 
     - name: Start Minecraft
       become_user: ubuntu
