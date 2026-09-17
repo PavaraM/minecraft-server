@@ -11,3 +11,7 @@ data "oci_core_images" "ubuntu" {
   sort_by    = "TIMECREATED"
   sort_order = "DESC"
 }
+
+data "oci_identity_availability_domains" "ads" {
+  compartment_id = var.compartment_id
+}

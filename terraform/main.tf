@@ -101,7 +101,7 @@ resource "oci_core_subnet" "minecraft" {
 
 resource "oci_core_instance" "minecraft" {
   compartment_id      = var.compartment_id
-  availability_domain = var.availability_domain
+  availability_domain = data.oci_identity_availability_domains.ads.availability_domains[0].name
 
   display_name = "minecraft-server"
 
