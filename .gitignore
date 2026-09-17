@@ -22,3 +22,7 @@ override.tf.json
 # Include override directories
 .terraform.rc
 terraform.rc
+
+# Minecraft runtime data and downloaded mods (large/generated, fetched on deploy)
+minecraft/world/
+minecraft/mods/
