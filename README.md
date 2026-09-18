@@ -166,7 +166,7 @@ so subsequent deploys won't clobber the live world.
 ### 4. Configure the server
 
 ```bash
-export MINECRAFT_HOST="$(cd terraform && terraform output -raw minecraft_public_ip)"
+set -a && source .env && set +a   # exports MINECRAFT_HOST from local .env
 ansible-playbook -i ansible/inventory.ini ansible/playbook.yml
 ```
 

@@ -26,3 +26,6 @@ terraform.rc
 # Minecraft runtime data and downloaded mods (large/generated, fetched on deploy)
 minecraft/world/
 minecraft/mods/
+
+# Local server configuration (contains the live server IP)
+.env
