@@ -80,7 +80,9 @@ A single playbook that configures the freshly provisioned server:
    enables it, and adds the `ubuntu` user to the `docker` group.
 3. Installs monitoring utilities (`htop`, `iotop`, `ncdu`).
 4. Deploys the Minecraft stack to `/opt/minecraft`: copies `compose.yaml`,
-   creates the `mods` dir, and copies `minecraft/mods/` contents.
+   creates the `mods` dir, and **rsyncs** `minecraft/mods/` contents
+   (incremental — only changed files transfer; removed mods are kept on the
+   server).
 5. **Seeds the world on first run only** — checks for
    `/opt/minecraft/world/level.dat`; if absent, rsyncs `minecraft/world/` to the
    server and fixes ownership. Subsequent runs leave the running world untouched.

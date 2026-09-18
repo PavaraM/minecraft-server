@@ -100,13 +100,19 @@
         group: ubuntu
         mode: "0755"
 
-    - name: Copy Minecraft mods
-      ansible.builtin.copy:
+    - name: Sync Minecraft mods
+      ansible.posix.synchronize:
         src: "{{ playbook_dir }}/../minecraft/mods/"
         dest: /opt/minecraft/mods/
+      become: false
+
+    - name: Fix mods ownership after rsync
+      ansible.builtin.file:
+        path: /opt/minecraft/mods
+        state: directory
         owner: ubuntu
         group: ubuntu
-        mode: "0644"
+        recurse: true
 
     - name: Check if world already exists on the server
       ansible.builtin.stat:
