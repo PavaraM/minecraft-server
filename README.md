@@ -88,8 +88,9 @@ A single playbook that configures the freshly provisioned server:
 7. Installs and configures **UFW** (`25565/tcp`, `24454/udp`).
 8. Deploys a monitoring stack (see Known gaps) to `/opt/monitoring` and starts it.
 
-Inventory: `ansible/inventory.ini` — host comes from the `MINECRAFT_HOST`
-environment variable (keeps the live IP out of version control), user `ubuntu`.
+Inventory: `ansible/inventory.ini` — user `ubuntu`; the server IP is supplied at
+run time from the local `MINECRAFT_HOST` env var (keeps the live IP out of
+version control).
 
 ### 3. Minecraft (`minecraft/`)
 
@@ -167,7 +168,7 @@ so subsequent deploys won't clobber the live world.
 
 ```bash
 set -a && source .env && set +a   # exports MINECRAFT_HOST from local .env
-ansible-playbook -i ansible/inventory.ini ansible/playbook.yml
+ansible-playbook -i ansible/inventory.ini -e "ansible_host=$MINECRAFT_HOST" ansible/playbook.yml
 ```
 
 Verify: `docker exec minecraft mc-send-to-console list` (or check `docker ps`)
