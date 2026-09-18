@@ -7,7 +7,7 @@ Infrastructure, built as an end-to-end DevOps project:
 - **Ansible** configures the server (Docker, firewall, deploy + first-run world seed).
 - **Docker Compose** runs the server container and applies mods.
 
-Live deployment: `ap-mumbai-1`, Ubuntu 24.04 (aarch64), public IP `137.23.32.205`.
+- Live deployment: `ap-mumbai-1`, Ubuntu 24.04 (aarch64).
 
 ```
 ┌─────────────┐   terraform apply   ┌────────────────────────────────────────────┐
@@ -88,7 +88,8 @@ A single playbook that configures the freshly provisioned server:
 7. Installs and configures **UFW** (`25565/tcp`, `24454/udp`).
 8. Deploys a monitoring stack (see Known gaps) to `/opt/monitoring` and starts it.
 
-Inventory: `ansible/inventory.ini` — host `137.23.32.205`, user `ubuntu`.
+Inventory: `ansible/inventory.ini` — host comes from the `MINECRAFT_HOST`
+environment variable (keeps the live IP out of version control), user `ubuntu`.
 
 ### 3. Minecraft (`minecraft/`)
 
@@ -165,6 +166,7 @@ so subsequent deploys won't clobber the live world.
 ### 4. Configure the server
 
 ```bash
+export MINECRAFT_HOST="$(cd terraform && terraform output -raw minecraft_public_ip)"
 ansible-playbook -i ansible/inventory.ini ansible/playbook.yml
 ```
 
